@@ -9,7 +9,6 @@ import {
   CCard,
   CCardBody,
   CCol,
-  CProgress,
   CRow,
   CTable,
   CTableBody,
@@ -26,21 +25,7 @@ import {
   CTableRow,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
-import {
-  cibCcAmex,
-  cibCcApplePay,
-  cibCcMastercard,
-  cibCcPaypal,
-  cibCcStripe,
-  cibCcVisa,
-  cifBr,
-  cifEs,
-  cifFr,
-  cifIn,
-  cifPl,
-  cifUs,
-  cilPeople,
-} from '@coreui/icons'
+import { cifEs, cifUs, cilPeople } from '@coreui/icons'
 
 import avatar1 from 'src/assets/images/avatars/1.jpg'
 import avatar2 from 'src/assets/images/avatars/2.jpg'
@@ -49,6 +34,46 @@ import avatar4 from 'src/assets/images/avatars/4.jpg'
 
 const Dashboard = () => {
   const [visible, setVisible] = useState(false)
+
+  const [firstName, setFirstName] = useState('')
+  const [lastName, setLastName] = useState('')
+  const [country, setCountry] = useState('')
+  const [position, setPosition] = useState('')
+  const [status, setStatus] = useState('')
+
+  const handleUserCreation = async () => {
+    // Prepare the player data to be sent to the server
+    const playerData = {
+      name: `${firstName} ${lastName}`,
+      country,
+      position,
+      status,
+    }
+
+    console.log('Player Data:', playerData) // Log the data to verify
+
+    try {
+      const response = await fetch('http://localhost:5000/api/data', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(playerData),
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        alert('Player data saved successfully!')
+        setVisible(false) // Close the modal on successful save
+      } else {
+        alert('Error saving player data: ' + data.message)
+      }
+    } catch (error) {
+      console.error('Error:', error)
+      alert('Error saving player data')
+    }
+  }
 
   const tableExample = [
     {
@@ -164,23 +189,50 @@ const Dashboard = () => {
         </CModalHeader>
         <CModalBody>
           <CForm>
-            <CFormInput type="text" label="Vorname" />
+            <CFormInput
+              type="text"
+              label="Vorname"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+            />{' '}
           </CForm>
           <CForm>
-            <CFormInput type="text" label="Nachname" />
+            <CFormInput
+              type="text"
+              label="Nachname"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+            />
           </CForm>
           <CForm>
-            <CFormInput type="text" label="Land" />
+            <CFormInput
+              type="text"
+              label="Land"
+              value={country}
+              onChange={(e) => setCountry(e.target.value)}
+            />
           </CForm>
           <CForm>
-            <CFormInput type="text" label="Position" />
+            <CFormInput
+              type="text"
+              label="Position"
+              value={position}
+              onChange={(e) => setPosition(e.target.value)}
+            />
           </CForm>
           <CForm>
-            <CFormInput type="text" label="Status" />
+            <CFormInput
+              type="text"
+              label="Status"
+              value={status}
+              onChange={(e) => setStatus(e.target.value)}
+            />
           </CForm>
         </CModalBody>
         <CModalFooter className="d-flex justify-content-center">
-          <CButton color="primary">Anlegen</CButton>
+          <CButton color="primary" onClick={handleUserCreation}>
+            Anlegen
+          </CButton>
           <CButton color="secondary" onClick={() => setVisible(false)}>
             Abbrechnen
           </CButton>
