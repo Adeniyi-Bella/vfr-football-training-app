@@ -1,7 +1,7 @@
 import React from 'react'
 import './Dashboard.css'
 import * as icon from '@coreui/icons'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 import {
   CAvatar,
@@ -13,115 +13,84 @@ import {
   CTable,
   CTableBody,
   CTableDataCell,
-  CForm,
-  CFormInput,
   CTableHead,
   CTableHeaderCell,
-  CModal,
-  CModalBody,
-  CModalFooter,
-  CModalHeader,
-  CModalTitle,
   CTableRow,
+  CSpinner,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
-import { cifEs, cifUs, cilPeople } from '@coreui/icons'
-
-import avatar1 from 'src/assets/images/avatars/1.jpg'
-import avatar2 from 'src/assets/images/avatars/2.jpg'
-import avatar3 from 'src/assets/images/avatars/3.jpg'
-import avatar4 from 'src/assets/images/avatars/4.jpg'
+import { cilPeople } from '@coreui/icons'
+import AddNewPlayerDialogue from './dialogues/AddNewPlayerDialogue'
+import DeletePlayerDialogue from './dialogues/DeletePlayerDialogue'
+// import ReadPlayerDialogue from './dialogues/ReadPlayerDialogue'
+import EditPlayerDialogue from './dialogues/EditPlayerDialogue'
 
 const Dashboard = () => {
   const [visible, setVisible] = useState(false)
+  const [visibleDelete, setVisibleDelete] = useState(false)
+  const [visibleEdit, setVisibleEdit] = useState(false)
+  const [players, setPlayers] = useState([])
+  const [loading, setLoading] = useState(false)
 
-  const [firstName, setFirstName] = useState('')
-  const [lastName, setLastName] = useState('')
-  const [country, setCountry] = useState('')
-  const [position, setPosition] = useState('')
-  const [status, setStatus] = useState('')
-
-  const handleUserCreation = async () => {
-    // Prepare the player data to be sent to the server
-    const playerData = {
-      name: `${firstName} ${lastName}`,
-      country,
-      position,
-      status,
-    }
-
-    console.log('Player Data:', playerData) // Log the data to verify
-
+  // Fetch players (moved outside useEffect)
+  const fetchPlayers = async () => {
+    setLoading(true)
     try {
-      const response = await fetch('http://localhost:5000/api/data', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(playerData),
-      })
-
+      const response = await fetch('http://localhost:4000/api/data')
       const data = await response.json()
-
-      if (response.ok) {
-        alert('Player data saved successfully!')
-        setVisible(false) // Close the modal on successful save
-      } else {
-        alert('Error saving player data: ' + data.message)
-      }
+      setPlayers(data)
     } catch (error) {
-      console.error('Error:', error)
-      alert('Error saving player data')
+      console.error('Error fetching player data:', error)
+    } finally {
+      setLoading(false)
     }
   }
 
-  const tableExample = [
-    {
-      avatar: { src: avatar1, status: 'success' },
-      user: {
-        name: 'Yiorgos Avraamu',
-      },
-      country: { name: 'USA', flag: cifUs },
-      status: 'Aktiv',
-      position: 'Goalkeeper',
-    },
-    {
-      avatar: { src: avatar2, status: 'danger' },
-      user: {
-        name: 'Yiorgos Avraamu',
-      },
-      country: { name: 'USA', flag: icon.cifNg },
-      status: 'Unavailable',
-      position: 'Stürmer',
-    },
-    {
-      avatar: { src: avatar3, status: 'warning' },
-      user: {
-        name: 'Yiorgos Avraamu',
-      },
-      country: { name: 'USA', flag: icon.cifTr },
-      status: 'Inaktiv',
-      position: 'Goalkeeper',
-    },
-    {
-      avatar: { src: avatar4, status: 'secondary' },
-      user: {
-        name: 'Yiorgos Avraamu',
-      },
-      country: { name: 'USA', flag: cifEs },
-      status: 'Aktiv',
-      position: 'Verteidilger',
-    },
-  ]
+  const closeNewPlayerDialogue = () => {
+    setVisible(false)
+    fetchPlayers()
+  }
+
+  const toggleDeletePlayerDialogue = () => {
+    setVisibleDelete(!visibleDelete)
+    fetchPlayers()
+  }
+
+  const toggleEditPlayerDialogue = () => {
+    setVisibleEdit(!visibleEdit)
+    fetchPlayers()
+  }
+
+  useEffect(() => {
+    fetchPlayers()
+  }, [])
+
+  // Function to determine the avatar status based on the player's status
+  const getAvatarStatus = (status) => {
+    switch (status) {
+      case 'Aktiv': // Active
+        return 'success'
+      case 'Nicht verfügbar': // Unavailable
+        return 'danger'
+      case 'Inaktiv': // Inactive
+        return 'warning' // You can use 'warning' or any other status you prefer
+      default:
+        return 'secondary' // Default fallback if status is not recognized
+    }
+  }
 
   return (
     <>
+      {/* <CAlert color="success" className="d-flex align-items-center">
+        <CIcon icon={cilCheckCircle} className="flex-shrink-0 me-2" width={24} height={24} />
+        <div>An example success alert with an icon</div>
+      </CAlert> */}
       <CCard className="mb-4"></CCard>
       <CRow>
         <CCol xs>
           <CCard className="mb-4 ">
             <CButton onClick={() => setVisible(!visible)} className="players" color="primary">
-              <CIcon icon={icon.cilPlus} />
+              <CIcon icon={icon.cilUserPlus} />
               Neu Spieler Anlegen
             </CButton>
             <CCardBody className="playerTable">
@@ -140,104 +109,85 @@ const Dashboard = () => {
                     <CTableHeaderCell className="bg-body-tertiary text-center">
                       Position
                     </CTableHeaderCell>
-                    {/* <CTableHeaderCell className="bg-body-tertiary">Activity</CTableHeaderCell> */}
+                    <CTableHeaderCell className="bg-body-tertiary text-center"></CTableHeaderCell>
                   </CTableRow>
                 </CTableHead>
                 <CTableBody>
-                  {tableExample.map((item, index) => (
-                    <CTableRow v-for="item in tableItems" key={index}>
-                      <CTableDataCell className="text-center">
-                        <CAvatar size="md" src={item.avatar.src} status={item.avatar.status} />
+                  {players.length > 0 ? (
+                    players.map((player, index) => (
+                      <CTableRow key={index}>
+                        <CTableDataCell className="text-center">
+                          <CAvatar
+                            size="md"
+                            src={`data:image/png;base64,${player.image?.data}`}
+                            status={getAvatarStatus(player.status)} // Dynamically set the status
+                          />
+                        </CTableDataCell>
+                        <CTableDataCell>
+                          <div>{player.name}</div>
+                        </CTableDataCell>
+                        <CTableDataCell className="text-center">
+                          {player.country ? (
+                            <CIcon size="xl" icon={icon[player.country]} title={player.country} />
+                          ) : (
+                            <span>No country</span> // You can display a fallback message or icon here
+                          )}
+                        </CTableDataCell>
+                        <CTableDataCell>{player.status}</CTableDataCell>
+                        <CTableDataCell className="text-center">{player.position}</CTableDataCell>
+                        <CTableDataCell
+                          className="text-center"
+                          style={{
+                            cursor: 'pointer',
+                            padding: 10,
+                          }}
+                        >
+                          <CIcon
+                            style={{ marginRight: 10 }}
+                            size="xl"
+                            icon={icon.cilUser}
+                            title="Spieler Lesen"
+                          />
+                          <CIcon
+                            style={{ marginRight: 10 }}
+                            size="xl"
+                            icon={icon.cilPen}
+                            onClick={toggleEditPlayerDialogue}
+                            title="Spieler Bearbeiten"
+                          />
+                          <CIcon
+                            size="xl"
+                            icon={icon.cilTrash}
+                            onClick={toggleDeletePlayerDialogue}
+                            title="Spieler Löschen"
+                          />
+                        </CTableDataCell>
+                      </CTableRow>
+                    ))
+                  ) : (
+                    <CTableRow>
+                      <CTableDataCell colSpan="5" className="text-center">
+                        <CSpinner />
                       </CTableDataCell>
-                      <CTableDataCell>
-                        <div>{item.user.name}</div>
-                        {/* <div className="small text-body-secondary text-nowrap">
-                          <span>{item.user.new ? 'New' : 'Recurring'}</span> | Registered:{' '}
-                          {item.user.registered}
-                        </div> */}
-                      </CTableDataCell>
-                      <CTableDataCell className="text-center">
-                        <CIcon size="xl" icon={item.country.flag} title={item.country.name} />
-                      </CTableDataCell>
-                      <CTableDataCell>
-                        <div>{item.status}</div>
-                      </CTableDataCell>
-                      <CTableDataCell className="text-center">
-                        <div>{item.position}</div>
-                      </CTableDataCell>
-                      {/* <CTableDataCell>
-                        <div className="small text-body-secondary text-nowrap">Last login</div>
-                        <div className="fw-semibold text-nowrap">{item.activity}</div>
-                      </CTableDataCell> */}
                     </CTableRow>
-                  ))}
+                  )}
                 </CTableBody>
               </CTable>
             </CCardBody>
           </CCard>
         </CCol>
       </CRow>
-      <CModal
-        alignment="center"
-        visible={visible}
-        onClose={() => setVisible(false)}
-        aria-labelledby="VerticallyCenteredExample"
-        size="sm"
-      >
-        <CModalHeader>
-          <CModalTitle id="VerticallyCenteredExample">Neu Spieler Anlegen</CModalTitle>
-        </CModalHeader>
-        <CModalBody>
-          <CForm>
-            <CFormInput
-              type="text"
-              label="Vorname"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-            />{' '}
-          </CForm>
-          <CForm>
-            <CFormInput
-              type="text"
-              label="Nachname"
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
-            />
-          </CForm>
-          <CForm>
-            <CFormInput
-              type="text"
-              label="Land"
-              value={country}
-              onChange={(e) => setCountry(e.target.value)}
-            />
-          </CForm>
-          <CForm>
-            <CFormInput
-              type="text"
-              label="Position"
-              value={position}
-              onChange={(e) => setPosition(e.target.value)}
-            />
-          </CForm>
-          <CForm>
-            <CFormInput
-              type="text"
-              label="Status"
-              value={status}
-              onChange={(e) => setStatus(e.target.value)}
-            />
-          </CForm>
-        </CModalBody>
-        <CModalFooter className="d-flex justify-content-center">
-          <CButton color="primary" onClick={handleUserCreation}>
-            Anlegen
-          </CButton>
-          <CButton color="secondary" onClick={() => setVisible(false)}>
-            Abbrechnen
-          </CButton>
-        </CModalFooter>
-      </CModal>
+
+      {/* Add New Player Dialogue */}
+      <AddNewPlayerDialogue closeNewPlayerDialogue={closeNewPlayerDialogue} visible={visible} />
+      <DeletePlayerDialogue
+        toggleDeletePlayerDialogue={toggleDeletePlayerDialogue}
+        visibleDelete={visibleDelete}
+      />
+      <EditPlayerDialogue
+        toggleEditPlayerDialogue={toggleEditPlayerDialogue}
+        visibleEdit={visibleEdit}
+      />
     </>
   )
 }

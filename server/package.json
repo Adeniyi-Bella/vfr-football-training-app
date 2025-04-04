@@ -3,17 +3,23 @@
     "version": "1.0.0",
     "main": "server.js",
     "scripts": {
-        "start": "node index.js"
+        "start": "node index.js",
+        "dev": "nodemon index.js"
     },
     "type": "module",
     "dependencies": {
+        "cors": "^2.8.5",
+        "dotenv": "^16.4.7",
         "express": "^4.17.1",
-        "mongoose": "^5.10.9"
+        "mongoose": "^8.13.1",
+        "multer": "^1.4.5-lts.2",
+        "sharp": "^0.33.5"
     },
     "devDependencies": {
         "@types/body-parser": "^1.19.5",
         "@types/cors": "^2.8.17",
         "@types/express": "^5.0.1",
-        "cors": "^2.8.5"
+        "@types/multer": "^1.4.12",
+        "nodemon": "^3.1.9"
     }
 }
