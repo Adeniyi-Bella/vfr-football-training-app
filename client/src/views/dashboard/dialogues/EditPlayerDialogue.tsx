@@ -1,14 +1,8 @@
-import React from 'react'
 import * as icon from '@coreui/icons'
 import { useState } from 'react'
-import Select from 'react-select'
 
 import {
   CButton,
-  CCol,
-  CForm,
-  CFormLabel,
-  CFormInput,
   CModal,
   CModalBody,
   CModalFooter,
@@ -17,9 +11,8 @@ import {
   CSpinner,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
-import * as icons from '@coreui/icons'
 
-const DeletePlayerDialogue = ({ visibleDelete, toggleDeletePlayerDialogue }) => {
+const EditPlayerDialogue = ({ visibleEdit, toggleEditPlayerDialogue }) => {
   const [firstName, setFirstName] = useState('')
   const [loading, setLoading] = useState(false)
   const [validated, setValidated] = useState(false)
@@ -63,18 +56,18 @@ const DeletePlayerDialogue = ({ visibleDelete, toggleDeletePlayerDialogue }) => 
     <>
       <CModal
         alignment="center"
-        visible={visibleDelete}
+        visible={visibleEdit}
         onClose={() => {
           {
             setValidated(false)
-            toggleDeletePlayerDialogue
+            toggleEditPlayerDialogue
           }
         }}
         aria-labelledby="VerticallyCenteredExample"
         size="sm"
       >
         <CModalHeader>
-          <CModalTitle id="VerticallyCenteredExample"> Spieler Löschen</CModalTitle>
+          <CModalTitle id="VerticallyCenteredExample"> Spieler Bearbeiten</CModalTitle>
         </CModalHeader>
 
         <CModalBody>
@@ -83,7 +76,7 @@ const DeletePlayerDialogue = ({ visibleDelete, toggleDeletePlayerDialogue }) => 
               marginBottom: 20,
             }}
           >
-            <p>Mann kann mit diese dialogue eine Spieler löschen.</p>
+            <p>Mann kann mit diese dialogue eine Spieler Bearbeiten.</p>
           </div>
         </CModalBody>
         <CModalFooter className="d-flex justify-content-center">
@@ -96,12 +89,12 @@ const DeletePlayerDialogue = ({ visibleDelete, toggleDeletePlayerDialogue }) => 
               </>
             ) : (
               <>
-                <CIcon icon={icon.cilTrash} />
-                Löschen
+                <CIcon icon={icon.cilPen} />
+                Bearbeiten
               </>
             )}
           </CButton>
-          <CButton color="secondary" onClick={toggleDeletePlayerDialogue}>
+          <CButton color="secondary" onClick={toggleEditPlayerDialogue}>
             <CIcon icon={icon.cilX} />
             Abbrechen
           </CButton>
@@ -111,4 +104,4 @@ const DeletePlayerDialogue = ({ visibleDelete, toggleDeletePlayerDialogue }) => 
   )
 }
 
-export default DeletePlayerDialogue
+export default EditPlayerDialogue

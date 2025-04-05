@@ -3,7 +3,6 @@ import Calendar from 'react-calendar'
 import 'react-calendar/dist/Calendar.css'
 import 'primereact/resources/themes/lara-light-cyan/theme.css'
 import Select from 'react-select'
-import React from 'react'
 import './Training.css'
 import { CButton } from '@coreui/react'
 import * as icon from '@coreui/icons'
@@ -16,6 +15,16 @@ const options = [
   { value: '4', label: 'Max' },
   { value: '5', label: 'Bella' },
   { value: '6', label: 'Michel' },
+  { value: '7', label: 'Niklas' },
+  { value: '8', label: 'Raphael' },
+  { value: '9', label: 'Sara' },
+  { value: '10', label: 'Tobias' },
+  { value: '11', label: 'Ursula' },
+  { value: '12', label: 'Viktor' },
+  { value: '13', label: 'Walter' },
+  { value: '14', label: 'Xena' },
+  { value: '15', label: 'Yannick' },
+  { value: '16', label: 'Zara' },
 ]
 
 const Dashboard = () => {
@@ -74,7 +83,7 @@ const Dashboard = () => {
             />
           </div>
 
-          <div className="select-wrapper">
+          {/* <div className="select-wrapper">
             <p style={{ margin: 0 }}>Urlaub</p>
             <Select
               className="select"
@@ -85,7 +94,7 @@ const Dashboard = () => {
               value={keineAntwort}
               onChange={(selected) => setKeineAntwort(selected || [])}
             />
-          </div>
+          </div> */}
 
           <div className="select-wrapper">
             <p style={{ margin: 0 }}>KeineAntwort</p>

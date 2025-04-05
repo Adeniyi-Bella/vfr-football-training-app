@@ -1,4 +1,3 @@
-import React from 'react'
 import './Dashboard.css'
 import * as icon from '@coreui/icons'
 import { useState, useEffect } from 'react'
@@ -29,7 +28,8 @@ const Dashboard = () => {
   const [visible, setVisible] = useState(false)
   const [visibleDelete, setVisibleDelete] = useState(false)
   const [visibleEdit, setVisibleEdit] = useState(false)
-  const [players, setPlayers] = useState([])
+  const [players, setPlayers] = useState(null)
+  const [selectedPlayer, setSelectedPlayer] = useState(null)
   const [loading, setLoading] = useState(false)
 
   // Fetch players (moved outside useEffect)
@@ -39,6 +39,8 @@ const Dashboard = () => {
       const response = await fetch('http://localhost:4000/api/data')
       const data = await response.json()
       setPlayers(data)
+      console.log('Fetched players:', data);
+
     } catch (error) {
       console.error('Error fetching player data:', error)
     } finally {
@@ -51,8 +53,13 @@ const Dashboard = () => {
     fetchPlayers()
   }
 
-  const toggleDeletePlayerDialogue = () => {
-    setVisibleDelete(!visibleDelete)
+  // const openDeletePlayerDialogue = () => {
+  //   setVisibleDelete(true)
+  //   fetchPlayers()
+  // }
+
+  const closeDeletePlayerDialogue = () => {
+    setVisibleDelete(false)
     fetchPlayers()
   }
 
@@ -113,7 +120,7 @@ const Dashboard = () => {
                   </CTableRow>
                 </CTableHead>
                 <CTableBody>
-                  {players.length > 0 ? (
+                  {players? (
                     players.map((player, index) => (
                       <CTableRow key={index}>
                         <CTableDataCell className="text-center">
@@ -158,7 +165,10 @@ const Dashboard = () => {
                           <CIcon
                             size="xl"
                             icon={icon.cilTrash}
-                            onClick={toggleDeletePlayerDialogue}
+                            onClick={() => {
+                              setSelectedPlayer(player)
+                              setVisibleDelete(true)
+                            }}
                             title="Spieler Löschen"
                           />
                         </CTableDataCell>
@@ -181,8 +191,9 @@ const Dashboard = () => {
       {/* Add New Player Dialogue */}
       <AddNewPlayerDialogue closeNewPlayerDialogue={closeNewPlayerDialogue} visible={visible} />
       <DeletePlayerDialogue
-        toggleDeletePlayerDialogue={toggleDeletePlayerDialogue}
+        toggleDeletePlayerDialogue={closeDeletePlayerDialogue}
         visibleDelete={visibleDelete}
+        selectedPlayer={selectedPlayer}
       />
       <EditPlayerDialogue
         toggleEditPlayerDialogue={toggleEditPlayerDialogue}

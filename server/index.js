@@ -114,6 +114,24 @@ app.get("/api/data", async (req, res) => {
     }
 });
 
+app.delete("/api/data/:id", async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const deletedPlayer = await Data.findByIdAndDelete(id);
+
+        if (!deletedPlayer) {
+            return res.status(404).json({ message: "Player not found" });
+        }
+
+        res.status(200).json({ message: "Player deleted successfully" });
+    } catch (error) {
+        console.error("Error deleting player:", error);
+        res.status(500).json({ message: "Error deleting player" });
+    }
+});
+
+
 // Start server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

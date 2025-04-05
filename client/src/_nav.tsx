@@ -1,4 +1,3 @@
-import React from 'react'
 import CIcon from '@coreui/icons-react'
 import { cilFootball, cilSpeedometer } from '@coreui/icons'
 import { CNavItem } from '@coreui/react'
